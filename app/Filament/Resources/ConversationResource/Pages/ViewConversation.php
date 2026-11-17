@@ -34,7 +34,7 @@ class ViewConversation extends XotBaseViewRecord
                 ])
                 ->action(function (Conversation $record, array $data): void {
                     $body = $data['body'] ?? '';
-                    app(ReplyAsOperatorAction::class)->execute($record, (int) Auth::id(), is_string($body) ? $body : '');
+                    app(ReplyAsOperatorAction::class)->execute($record, (string) Auth::id(), is_string($body) ? $body : '');
                     Notification::make()->success()->title(\trans_string('passaparola::conversation.notifications.reply_sent'))->send();
                 }),
 

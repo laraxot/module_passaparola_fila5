@@ -26,6 +26,7 @@ use Modules\Xot\Models\XotBaseModel;
  * @property Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ChatWidget> $chatWidgets
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Conversation> $conversations
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, WorkspaceMember> $members
  *
  * @method static Builder<static>|Workspace newModelQuery()
  * @method static Builder<static>|Workspace newQuery()
@@ -55,6 +56,12 @@ class Workspace extends XotBaseModel
     public function conversations(): HasMany
     {
         return $this->hasMany(Conversation::class);
+    }
+
+    /** @return HasMany<WorkspaceMember, $this> */
+    public function members(): HasMany
+    {
+        return $this->hasMany(WorkspaceMember::class);
     }
 
     /** Collection della base di conoscenza nel modulo AI. */

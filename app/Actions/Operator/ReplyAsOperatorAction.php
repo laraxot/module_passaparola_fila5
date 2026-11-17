@@ -33,7 +33,7 @@ final class ReplyAsOperatorAction
         private readonly ConfirmAiActionProposalAction $confirmProposal,
     ) {}
 
-    public function execute(Conversation $conversation, int $operatorUserId, string $body): AiMessage
+    public function execute(Conversation $conversation, int|string $operatorUserId, string $body): AiMessage
     {
         $body = trim($body);
         if ($body === '') {

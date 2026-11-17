@@ -7,6 +7,7 @@ namespace Modules\Passaparola\Filament\Resources;
 use Filament\Widgets\Widget;
 use Modules\Passaparola\Filament\Resources\ChatWidgetResource\Pages;
 use Modules\Passaparola\Models\ChatWidget;
+use Modules\Passaparola\Filament\Concerns\ScopesToAccessibleWorkspaces;
 use Modules\Xot\Filament\Resources\XotBaseResource;
 
 /**
@@ -14,6 +15,8 @@ use Modules\Xot\Filament\Resources\XotBaseResource;
  */
 class ChatWidgetResource extends XotBaseResource
 {
+    use ScopesToAccessibleWorkspaces;
+
     protected static ?string $model = ChatWidget::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';

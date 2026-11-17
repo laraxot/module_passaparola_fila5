@@ -80,7 +80,9 @@ Story: [project-decoupling-from-fixcity.story.md](stories/project-decoupling-fro
 | P1 | Privacy: account cancellati | Lo scheduler di Fixcity eliminava gli account cancellati dopo `gdpr.retention.deleted_account_days`. Serve un'azione equivalente (modulo User o Gdpr, agnostica) |
 | P1 | Privacy: conversazioni | `ai_messages` conserva le domande dei visitatori senza scadenza: definire la conservazione e una pulizia pianificata |
 | P1 | Contenuti legali | `privacy`, `note-legali`, `terms`, `cookie-policy`, `accessibilita` e `config/local/passaparola/lang/*/*.md` sono testi di Fixcity (servizio per i Comuni): vanno riscritti per Passaparola |
-| P1 | Accesso per attività | Il pannello Passaparola mostra conversazioni, widget e attività di tutti: serve legare gli utenti alle attività (owner/membri) e filtrare risorse e coda |
+| ~~P1~~ | Accesso per attività | **Risolto** (story 1.9, [access-control.md](access-control.md)) |
+| ~~P1~~ | Id utente | **Risolto**: modulo AI e Passaparola trattavano gli id utente come interi, ma gli utenti Laraxot hanno UUID (story `user-ids-as-strings` del modulo AI) |
+| P1 | Modulo User non agnostico | `BaseUser::canAccessPanel` contiene una regola per il pannello `restaurant::admin` di un altro progetto: va spostata nel progetto Restaurant |
 | P1 | Sicurezza | `laravel/.env.passaparola` è versionato e contiene credenziali del database locale: valutare di toglierlo dal repository |
 | P2 | Contenuti CMS | `domande-frequenti`, `services`, `events`, `lista-categorie`, `area-personale/*`, `sections/*` hanno ancora testi Fixcity |
 | P2 | Tema | Scelta definitiva del tema pubblico (ora `TwentyOne`, l'unico con i blocchi base); `Barthelemy` e `Meetup` non sono usati; le tab mobili di TwentyOne hanno voci pensate per Predict (mercati, classifica) |

@@ -7,6 +7,7 @@ namespace Modules\Passaparola\Filament\Resources;
 use Filament\Widgets\Widget;
 use Modules\Passaparola\Filament\Resources\WorkspaceResource\Pages;
 use Modules\Passaparola\Models\Workspace;
+use Modules\Passaparola\Filament\Concerns\ScopesToAccessibleWorkspaces;
 use Modules\Xot\Filament\Resources\XotBaseResource;
 
 /**
@@ -14,6 +15,13 @@ use Modules\Xot\Filament\Resources\XotBaseResource;
  */
 class WorkspaceResource extends XotBaseResource
 {
+    use ScopesToAccessibleWorkspaces;
+
+    protected static function workspaceColumn(): string
+    {
+        return 'id';
+    }
+
     protected static ?string $model = Workspace::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-storefront';

@@ -23,6 +23,7 @@ pubblicare i risultati) con assistente sul sito, passaggio a una persona e repor
 | 1.5 | Coda operatore e risposta dopo il passaggio | 1.4 | in revisione |
 | 1.6 | Report settimanale via email | 1.3 | in revisione |
 | 1.7 | Banco di prova: 50 domande difficili per attività | 1.4 | da fare |
+| 1.9 | Accesso per attività (titolari e operatori) | 1.5 | in revisione |
 | 1.8 | Pagina "cosa fa e non fa l'assistente" + informativa privacy e trasparenza AI | 1.4 | da fare |
 
 ## Criteri di completamento dell'epic

@@ -8,6 +8,7 @@ use Filament\Widgets\Widget;
 use Modules\Passaparola\Enums\ConversationStatusEnum;
 use Modules\Passaparola\Filament\Resources\ConversationResource\Pages;
 use Modules\Passaparola\Models\Conversation;
+use Modules\Passaparola\Filament\Concerns\ScopesToAccessibleWorkspaces;
 use Modules\Xot\Filament\Resources\XotBaseResource;
 
 /**
@@ -16,6 +17,8 @@ use Modules\Xot\Filament\Resources\XotBaseResource;
  */
 class ConversationResource extends XotBaseResource
 {
+    use ScopesToAccessibleWorkspaces;
+
     protected static ?string $model = Conversation::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-inbox-stack';
@@ -33,7 +36,7 @@ class ConversationResource extends XotBaseResource
 
     public static function getNavigationBadge(): ?string
     {
-        $waiting = Conversation::query()->where('status', ConversationStatusEnum::HANDED_OFF->value)->count();
+        $waiting = static::getEloquentQuery()->where('status', ConversationStatusEnum::HANDED_OFF->value)->count();
 
         return $waiting > 0 ? (string) $waiting : null;
     }

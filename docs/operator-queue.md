@@ -48,6 +48,5 @@ e finisce nella coda.
 
 ## Limiti noti
 
-- **Accesso per attività**: oggi chi entra nel pannello Passaparola vede le conversazioni di tutte le attività.
-  Prima di dare l'accesso ai titolari serve limitare ogni utente alle proprie attività (vedi audit, P1).
+- **Accesso per attività**: ognuno vede solo la coda delle proprie attività ([access-control.md](access-control.md)).
 - Nessuna notifica (email o push) all'arrivo di una nuova richiesta: solo il contatore e l'aggiornamento della lista.
