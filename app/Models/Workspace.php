@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Modules\Passaparola\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Modules\Passaparola\Database\Factories\WorkspaceFactory;
 use Modules\Xot\Models\XotBaseModel;
@@ -23,6 +24,8 @@ use Modules\Xot\Models\XotBaseModel;
  * @property bool $is_active
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ChatWidget> $chatWidgets
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Conversation> $conversations
  *
  * @method static Builder<static>|Workspace newModelQuery()
  * @method static Builder<static>|Workspace newQuery()
@@ -41,6 +44,18 @@ class Workspace extends XotBaseModel
         'report_email',
         'is_active',
     ];
+
+    /** @return HasMany<ChatWidget, $this> */
+    public function chatWidgets(): HasMany
+    {
+        return $this->hasMany(ChatWidget::class);
+    }
+
+    /** @return HasMany<Conversation, $this> */
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
+    }
 
     /** Collection della base di conoscenza nel modulo AI. */
     public function knowledgeCollection(): string

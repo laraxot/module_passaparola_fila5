@@ -19,7 +19,7 @@ pubblicare i risultati) con assistente sul sito, passaggio a una persona e repor
 | 1.1 | Scheletro del progetto Laraxot e modulo `Passaparola` | — | in revisione |
 | 1.2 | Modulo AI: thread anonimi e parole sensibili per chiamata | — | in revisione |
 | 1.3 | `Workspace` e base di conoscenza per attività | 1.1 | in revisione |
-| 1.4 | Widget chat incorporabile + API messaggi | 1.2, 1.3 | da fare |
+| 1.4 | Widget chat incorporabile + API messaggi | 1.2, 1.3 | in revisione |
 | 1.5 | Coda operatore e risposta dopo il passaggio | 1.4 | da fare |
 | 1.6 | Report settimanale via email | 1.3 | da fare |
 | 1.7 | Banco di prova: 50 domande difficili per attività | 1.4 | da fare |

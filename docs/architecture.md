@@ -18,25 +18,29 @@ Moduli separati, nomi del codice in inglese, logica applicativa in Actions, test
 
 | Esigenza | Integrazione prevista |
 |---|---|
-| Base di conoscenza per attività | collection per workspace; schema e implementazione da verificare |
-| Rispondere a domande | action AI con sorgenti approvate e fallback umano |
-| Storico conversazione | thread/messaggi con associazione sicura al visitatore |
-| Passaggio a un operatore | richiesta di handoff e coda operatore |
-| Report | aggregazione periodica senza esporre dati sensibili |
+| Base di conoscenza per attività | `AiKnowledgeEntry` con `collection` = `Workspace::knowledgeCollection()` (`passaparola-{slug}`) |
+| Rispondere a domande | `Assistant\AnswerQuestionAction` (solo fonti approvate, passaggio a una persona) |
+| Storico conversazione | `AiThread`/`AiMessage` (`CreateAiThreadAction`, `AppendAiMessageAction`); il visitatore è legato dal token di `Conversation` |
+| Passaggio a un operatore | proposta `assistant_handoff` + `Conversation.status = handed_off` |
+| Report | `Assistant\BuildAssistantReportAction` per collection |
 
-## Modello dati di dominio (bozza)
+## Modello dati di dominio
 
-- **Workspace**: name, slug, owner, settings e configurazione privacy.
-- **Widget**: workspace_id, public_key, allowed_domains, is_active.
-- **Conversation**: workspace_id, ai_thread_id nullable, visitor_token hash, visitor_email nullable, status.
-- **OperatorReply**: conversation_id, user_id, body, sent_at.
+| Modello | Campi | Stato |
+|---|---|---|
+| `Workspace` | name, slug, handoff_keywords, report_email, is_active | fatto (story 1.3) |
+| `ChatWidget` | workspace_id, name, public_key, allowed_origins, greeting, is_active | fatto (story 1.4, [widget.md](widget.md)) |
+| `Conversation` | workspace_id, chat_widget_id, ai_thread_id, visitor_token, status (open/handed_off/closed), last_message_at | fatto (story 1.4) |
+| `User` | estende `Modules\User\Models\BaseUser` | fatto |
+| Risposta dell'operatore | messaggio del thread AI con payload `kind = operator_reply` (nessuna tabella dedicata) | story 1.5 |
 
-Le tabelle, le relazioni e i vincoli sono ancora da realizzare e testare. I dati devono essere isolati per workspace.
+I dati sono separati per workspace: ogni conversazione e widget ha `workspace_id`, la base di conoscenza
+ha la sua `collection`. Da verificare nell'app host (migrazioni e test).
 
-## Flussi da implementare
+## Flussi
 
-1. Il visitatore apre il widget, riceve informativa e invia una domanda.
-2. L'assistente cerca una risposta tra le conoscenze approvate; in assenza di riscontro valido propone il passaggio umano.
+1. Il visitatore apre il widget, vede l'avviso che risponde un'AI e invia una domanda ([widget.md](widget.md)). **Fatto.**
+2. L'assistente risponde con le conoscenze approvate; altrimenti passa la conversazione a una persona. **Fatto.**
 3. L'operatore gestisce la coda e risponde.
 4. Il titolare revisiona conoscenze, metriche e report settimanale.
 5. L'amministratore Passaparola configura workspace e verifica qualità, accessi e privacy.
