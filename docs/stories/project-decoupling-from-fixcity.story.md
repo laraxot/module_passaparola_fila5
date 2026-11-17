@@ -31,6 +31,8 @@ moduli e temi. Dettaglio dei problemi: [project-audit.md](../project-audit.md).
 - [x] Tema TwentyOne: il layout `app` non compilava senza Predict; ora i componenti di modulo sono facoltativi
   (theme_twentyone_fila5, `docs/optional-module-components.md`)
 
+- [x] Copie di 12 moduli (AI, User, Activity, Notify, Geo, Tenant, Gdpr, Lang, Cms, Media, Job, Xot) riallineate ai repository: risolti 140 file con marcatori di conflitto
+
 ## Da fare
 
 - [ ] Verifica nell'app host (issue #7)

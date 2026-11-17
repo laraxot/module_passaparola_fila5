@@ -19,6 +19,8 @@ avvio dell'app, configurazione del tenant, autenticazione, rotte, gestione error
 strumenti (composer, npm, PHPUnit, PHPStan, release, deploy), ambiente, regole degli agenti,
 codice dei moduli AI e Passaparola, privacy.
 
+**Controllo di sintassi**: `php -l` su tutti i 9.691 file PHP di moduli, tema, `app`, `config`, `routes`, `bootstrap`: nessun errore reale (4 segnalazioni erano sintassi PHP 8.4, `new Classe()->metodo()`, non riconosciuta dal PHP 8.3 dell'ambiente dell'audit).
+
 **Limite**: nell'ambiente dell'audit non c'erano `vendor/` né accesso a Packagist, quindi niente
 `pest`, `phpstan` o avvio reale dell'app. Verifiche fatte: sintassi PHP, validità di JSON/XML,
 `bash -n` sugli script, confronto tra i riferimenti a classi, viste e cartelle e i file presenti.
@@ -42,6 +44,7 @@ Story: [project-decoupling-from-fixcity.story.md](stories/project-decoupling-fro
 | 11 | `deploy.sh` controllava asset del tema Sixteen | Il deploy si fermava sempre | Controllo sul manifest di TwentyOne |
 | 12 | `app/Models/ModulesFixcityAppModelsTicket.php`, `app/Observers/TicketObserver.php` | Codice morto verso classi inesistenti | Rimossi |
 | 13 | `app/Application.php` puntava gli asset nativi a `themes/Sixteen` | App NativePHP senza asset | `themes/TwentyOne` |
+| 15 | 140 file in 11 moduli (Activity 88, User 25, Notify, Geo, Xot, Tenant, Gdpr, Lang, Cms, Media, Job) con marcatori di conflitto git non risolti; tra questi `User/app/Models/Traits/BaseUserMutators.php` | Codice PHP non caricabile: `BaseUser`, quindi login e utenti, non funzionava | Le copie del progetto erano indietro rispetto ai repository dei moduli, dove i conflitti erano già risolti. Ogni copia è stata riallineata al `dev` del modulo dopo aver verificato file per file (hash git) che nessun file avesse modifiche presenti solo nel progetto |
 | 14 | Il layout `app` di TwentyOne conteneva `<x-predict::daily-bonus />` e `<x-predict::win-celebration />` | Blade risolve i componenti in compilazione: senza il modulo Predict ogni pagina andava in errore | `ResolveAvailableComponentsAction` + `<x-dynamic-component>` nel tema (vedi `Themes/TwentyOne/docs/optional-module-components.md`) |
 
 ## Identità, strumenti e regole corretti
@@ -84,3 +87,4 @@ Story: [project-decoupling-from-fixcity.story.md](stories/project-decoupling-fro
 | P2 | Documentazione | ~3.000 file in `docs/`, `bmad-output/` e alla radice parlano di Fixcity: pulizia da fare a blocchi, tenendo le regole Laraxot generiche di `docs/wiki/` |
 | P2 | Modulo AI | `MakeAIRequestAction` usa `gpt-4` di proposito quando non c'è un'impostazione (c'è un test che lo fissa) e un prompt di sistema predefinito sui ticket PA: decisione in issue #26 di module_ai_fila5 |
 | P3 | Moduli | `Event` è nella cartella dei moduli ma non in `gitmodules.ini` |
+| P2 | Sincronizzazione moduli | Le copie dei moduli nel progetto restano indietro rispetto ai repository (era così per 12 moduli): serve che la sync del computer di sviluppo giri anche per questo progetto, o un controllo in CI che confronti le copie con i repository |
