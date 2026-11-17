@@ -2,7 +2,7 @@
 title: "Passaparola - Architettura"
 type: architecture
 created: 2026-11-16
-updated: 2026-11-16
+updated: 2026-11-17
 status: draft
 ---
 
