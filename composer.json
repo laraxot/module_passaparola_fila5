@@ -1,0 +1,40 @@
+{
+    "name": "laraxot/module_passaparola_fila5",
+    "description": "Passaparola: assistenza clienti con AI per piccole attività",
+    "homepage": "https://github.com/laraxot/module_passaparola_fila5",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "marco sottana",
+            "email": "marco.sottana@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Passaparola\\Providers\\PassaparolaServiceProvider",
+                "Modules\\Passaparola\\Providers\\Filament\\AdminPanelProvider"
+            ],
+            "aliases": {}
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Passaparola\\": "app/",
+            "Modules\\Passaparola\\Database\\Factories\\": "database/factories/",
+            "Modules\\Passaparola\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Passaparola\\Tests\\": "tests/"
+        }
+    },
+    "require": {},
+    "repositories": [
+        {"type": "path", "url": "../Xot"},
+        {"type": "path", "url": "../UI"},
+        {"type": "path", "url": "../AI"}
+    ]
+}

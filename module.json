@@ -1,0 +1,12 @@
+{
+    "name": "Passaparola",
+    "alias": "passaparola",
+    "description": "Assistenza clienti con AI per piccole attività: base di conoscenza, passaggio a una persona, report",
+    "keywords": ["assistenza clienti", "helpdesk", "ai"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Passaparola\\Providers\\PassaparolaServiceProvider",
+        "Modules\\Passaparola\\Providers\\Filament\\AdminPanelProvider"
+    ],
+    "files": []
+}
