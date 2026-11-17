@@ -5,7 +5,7 @@ module: Passaparola
 created: 2026-11-17
 updated: 2026-11-17
 status: active
-issues: []
+issues: [7, 8, 9, 10]
 discussions: []
 related:
   - ./architecture.md
