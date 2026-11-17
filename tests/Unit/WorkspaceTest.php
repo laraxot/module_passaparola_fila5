@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Modules\Passaparola\Tests\Unit;
 
+use Modules\Passaparola\Models\User;
 use Modules\Passaparola\Models\Workspace;
 use Modules\Passaparola\Tests\TestCase;
+use Modules\User\Models\BaseUser;
 use PHPUnit\Framework\Assert;
 
 uses(TestCase::class);
@@ -23,4 +25,8 @@ test('_casts_keywords_and_active_flag', function (): void {
 
     Assert::assertSame(['rimbors'], $workspace->handoff_keywords);
     Assert::assertTrue($workspace->is_active);
+});
+
+test('_project_user_is_a_laraxot_base_user', function (): void {
+    Assert::assertTrue(is_subclass_of(User::class, BaseUser::class));
 });
