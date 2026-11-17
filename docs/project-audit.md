@@ -25,6 +25,8 @@ codice dei moduli AI e Passaparola, privacy.
 
 ## Problemi bloccanti trovati e corretti
 
+Story: [project-decoupling-from-fixcity.story.md](stories/project-decoupling-from-fixcity.story.md).
+
 | # | Problema | Effetto | Correzione |
 |---|---|---|---|
 | 1 | `config/app.php` registrava `Modules\Fixcity\Providers\FixcityServiceProvider` | L'app non partiva (classe inesistente) | Sostituito con `PassaparolaServiceProvider` |
@@ -40,6 +42,7 @@ codice dei moduli AI e Passaparola, privacy.
 | 11 | `deploy.sh` controllava asset del tema Sixteen | Il deploy si fermava sempre | Controllo sul manifest di TwentyOne |
 | 12 | `app/Models/ModulesFixcityAppModelsTicket.php`, `app/Observers/TicketObserver.php` | Codice morto verso classi inesistenti | Rimossi |
 | 13 | `app/Application.php` puntava gli asset nativi a `themes/Sixteen` | App NativePHP senza asset | `themes/TwentyOne` |
+| 14 | Il layout `app` di TwentyOne conteneva `<x-predict::daily-bonus />` e `<x-predict::win-celebration />` | Blade risolve i componenti in compilazione: senza il modulo Predict ogni pagina andava in errore | `ResolveAvailableComponentsAction` + `<x-dynamic-component>` nel tema (vedi `Themes/TwentyOne/docs/optional-module-components.md`) |
 
 ## Identità, strumenti e regole corretti
 
@@ -76,7 +79,7 @@ codice dei moduli AI e Passaparola, privacy.
 | P1 | Contenuti legali | `privacy`, `note-legali`, `terms`, `cookie-policy`, `accessibilita` e `config/local/passaparola/lang/*/*.md` sono testi di Fixcity (servizio per i Comuni): vanno riscritti per Passaparola |
 | P1 | Sicurezza | `laravel/.env.passaparola` è versionato e contiene credenziali del database locale: valutare di toglierlo dal repository |
 | P2 | Contenuti CMS | `domande-frequenti`, `services`, `events`, `lista-categorie`, `area-personale/*`, `sections/*` hanno ancora testi Fixcity |
-| P2 | Tema | Scelta definitiva del tema pubblico (ora `TwentyOne`, l'unico con i blocchi base); `Barthelemy` e `Meetup` non sono usati |
+| P2 | Tema | Scelta definitiva del tema pubblico (ora `TwentyOne`, l'unico con i blocchi base); `Barthelemy` e `Meetup` non sono usati; le tab mobili di TwentyOne hanno voci pensate per Predict (mercati, classifica) |
 | P2 | Documentazione | ~3.000 file in `docs/`, `bmad-output/` e alla radice parlano di Fixcity: pulizia da fare a blocchi, tenendo le regole Laraxot generiche di `docs/wiki/` |
 | P2 | Modulo AI | `MakeAIRequestAction` usa `gpt-4` di proposito quando non c'è un'impostazione (c'è un test che lo fissa) e un prompt di sistema predefinito sui ticket PA: decisione in issue #26 di module_ai_fila5 |
 | P3 | Moduli | `Event` è nella cartella dei moduli ma non in `gitmodules.ini` |
