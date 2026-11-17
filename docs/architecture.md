@@ -32,7 +32,7 @@ Moduli separati, nomi del codice in inglese, logica applicativa in Actions, test
 | `ChatWidget` | workspace_id, name, public_key, allowed_origins, greeting, is_active | fatto (story 1.4, [widget.md](widget.md)) |
 | `Conversation` | workspace_id, chat_widget_id, ai_thread_id, visitor_token, status (open/handed_off/closed), last_message_at | fatto (story 1.4) |
 | `User` | estende `Modules\User\Models\BaseUser` | fatto |
-| Risposta dell'operatore | messaggio del thread AI con payload `kind = operator_reply` (nessuna tabella dedicata) | story 1.5 |
+| Risposta dell'operatore | messaggio del thread AI con payload `kind = operator_reply` (nessuna tabella dedicata) | fatto (story 1.5) |
 
 I dati sono separati per workspace: ogni conversazione e widget ha `workspace_id`, la base di conoscenza
 ha la sua `collection`. Da verificare nell'app host (migrazioni e test).
@@ -41,8 +41,8 @@ ha la sua `collection`. Da verificare nell'app host (migrazioni e test).
 
 1. Il visitatore apre il widget, vede l'avviso che risponde un'AI e invia una domanda ([widget.md](widget.md)). **Fatto.**
 2. L'assistente risponde con le conoscenze approvate; altrimenti passa la conversazione a una persona. **Fatto.**
-3. L'operatore gestisce la coda e risponde.
-4. Il titolare revisiona conoscenze, metriche e report settimanale.
+3. L'operatore gestisce la coda e risponde ([operator-queue.md](operator-queue.md)). **Fatto.**
+4. Il titolare riceve il report settimanale ([weekly-report.md](weekly-report.md)) e aggiorna la base di conoscenza. **Fatto** (report); gestione della base di conoscenza per attività da rifinire.
 5. L'amministratore Passaparola configura workspace e verifica qualità, accessi e privacy.
 
 ## Decisioni aperte
