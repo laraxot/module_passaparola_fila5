@@ -17,6 +17,7 @@ discussions: []
 | [operator-queue.md](operator-queue.md) | Coda dell'operatore |
 | [weekly-report.md](weekly-report.md) | Report settimanale via email |
 | [access-control.md](access-control.md) | Chi vede cosa: amministrazione, titolari, operatori |
+| [agents-integration.md](agents-integration.md) | Proposta: MCP, AG-UI, A2UI, WebMCP (da datomatic/laravelday-2026) |
 | [project-audit.md](project-audit.md) | Audit del progetto: problemi corretti e aperti per priorità |
 | [stories/epic-1-mvp.md](stories/epic-1-mvp.md) | Epic 1: MVP vendibile al primo cliente |
 | [stories/1.1-1.3.module-and-workspace.story.md](stories/1.1-1.3.module-and-workspace.story.md) | Modulo e Workspace |
