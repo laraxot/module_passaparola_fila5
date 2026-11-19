@@ -42,7 +42,7 @@ Punto chiave: i tool MCP sono classi scritte **una volta** e riusate dall'agente
 | Logica unica da esporre | le Action (`ReplyAsOperatorAction`, `CloseConversationAction`, `SendWeeklyReportsAction`, `AnswerQuestionAction`...) |
 | Utente e permessi per ogni chiamata | `ResolveAccessibleWorkspaceIdsAction` + policy (story 1.9) |
 | "L'AI propone, l'umano conferma" | `AiActionProposal` + `AiActionHandlerRegistry` del modulo AI |
-| Conversazioni persistite | `AiThread` / `AiMessage` |
+| Conversazioni persistite | `AiThread` / `AiMessage` (assistente), `ai_agent_messages` (agenti) |
 | Fornitori del modello | cascata Groq → OpenRouter → OpenAI |
 | `routes/ai.php` | presente ma vuoto |
 | `laravel/mcp`, Sanctum, `neuron-ai`, librerie AG-UI/A2UI | **mancano** |
@@ -77,11 +77,18 @@ Il titolare o l'operatore collega Claude o Cursor al proprio account e gestisce 
 Una chat nel pannello Passaparola ("rispondi a tutti quelli che chiedono della spedizione", "cosa manca
 nella base di conoscenza?") che usa **gli stessi tool** della fase A in-process.
 
-- Modulo AI (agnostico): adattatore `McpTool` per neuron-ai, `MessageStore` su `AiThread`/`AiMessage`
-  (niente tabella `chat_messages` separata), endpoint AG-UI come Action invocabile.
-- Le approvazioni di neuron-ai (`withApprovalPolicy`) per `reply_to_conversation` e `close_conversation`.
-- È il "OperatorAssistantAgent" rimandato in `AI/docs/deferred-operator-assistant-agent.md`.
-- Dipendenze: `neuron-core/neuron-ai`, `@ag-ui/client`.
+**Fatta**: [operator-assistant.md](operator-assistant.md) (manuale) e story 2.3.
+
+- Modulo AI (agnostico, [AI/docs/agents.md](../../AI/docs/agents.md)): `XotBaseAgent`, `McpToolAdapter`,
+  endpoint AG-UI `StreamAgentRunAction`, fornitore dalla cascata Groq → OpenRouter.
+- Conversazioni dell'agente in una tabella **dedicata** `ai_agent_messages` (e i run in pausa in
+  `ai_agent_runs`), non in `AiThread`/`AiMessage`: neuron-ai salva messaggi completi (tool call,
+  risultati) e riprende i run dopo un'approvazione, con colonne e regole sue. Le tabelle
+  dell'assistente clienti restano com'erano.
+- Approvazioni (`withApprovalPolicy`) su `reply_to_conversation`, `close_conversation` e
+  `save_knowledge_entry`: ogni tool che cambia qualcosa (non read-only) chiede conferma, e un test lo verifica.
+- Passaparola: `OperatorAssistant` (agente), `RunOperatorAssistantAction` (rotta POST con sessione e CSRF),
+  pagina Filament `OperatorAssistant`, client JS `resources/js/operator-assistant.js` → `public/js/operator-assistant.js`.
 
 ### Fase C — Interfacce generate (A2UI)
 
