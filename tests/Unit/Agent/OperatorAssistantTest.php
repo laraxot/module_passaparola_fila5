@@ -64,3 +64,11 @@ test('_threads_are_bound_to_the_user', function (): void {
 
     Assert::assertSame('operator-9a1f-', RunOperatorAssistantAction::threadPrefix($user));
 });
+
+test('_the_assistant_can_show_kpis_charts_and_tables_without_confirmation', function (): void {
+    $tools = operatorAssistantTools();
+
+    Assert::assertArrayHasKey('render_surface', $tools);
+    Assert::assertFalse($tools['render_surface']->requiresApproval());
+    Assert::assertCount(count(OperatorAssistant::TOOLS) + 1, $tools);
+});

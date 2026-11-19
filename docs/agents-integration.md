@@ -4,7 +4,7 @@ type: analysis
 module: Passaparola
 created: 2026-11-18
 updated: 2026-11-19
-status: in-progress
+status: done-panel
 issues: [11]
 discussions: []
 related:
@@ -91,6 +91,9 @@ nella base di conoscenza?") che usa **gli stessi tool** della fase A in-process.
   pagina Filament `OperatorAssistant`, client JS `resources/js/operator-assistant.js` → `public/js/operator-assistant.js`.
 
 ### Fase C — Interfacce generate (A2UI)
+
+**Fatta per il pannello** (story 2.4): l'assistente operatore usa `render_surface` (modulo AI) per KPI,
+grafici e tabelle; il renderer si carica a richiesta. Manuale: [operator-assistant.md](operator-assistant.md#grafici-numeri-e-tabelle).
 
 - Nel pannello: schede delle conversazioni e grafici del report composti dall'agente.
 - Nel widget: per esempio un form "lascia la tua email" quando la domanda passa a una persona.

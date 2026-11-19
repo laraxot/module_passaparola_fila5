@@ -6,6 +6,7 @@ namespace Modules\Passaparola\Neuron\Agents;
 
 use Modules\AI\Neuron\Agents\XotBaseAgent;
 use Modules\AI\Neuron\Tools\McpToolAdapter;
+use Modules\AI\Neuron\Tools\RenderSurfaceTool;
 use Modules\Passaparola\Mcp\Tools\CloseConversationTool;
 use Modules\Passaparola\Mcp\Tools\ListWaitingConversationsTool;
 use Modules\Passaparola\Mcp\Tools\ListWorkspacesTool;
@@ -53,18 +54,25 @@ final class OperatorAssistant extends XotBaseAgent
         - Quando proponi una risposta a un cliente, scrivila prima per intero all'operatore; inviala con
           reply_to_conversation solo se te lo chiede. L'invio richiede comunque la sua conferma.
         - Nella base di conoscenza salva solo informazioni confermate dall'operatore, mai supposizioni.
-        - Presenta le conversazioni in elenco: id, attività, cliente, ultimo messaggio e da quanto attende.
-        TEXT;
+        - Presenta le conversazioni in elenco: id, attività, cliente, ultimo messaggio e da quanto attende;
+          se sono più di tre, mostrale in una DataTable con render_surface.
+        - Per il report settimanale mostra i numeri principali come Stat e, se ci sono più giorni o attività, un Chart.
+        TEXT."\n\n".RenderSurfaceTool::GUIDE;
     }
 
     /** @return list<ToolInterface> */
     protected function tools(): array
     {
-        return array_map(static function (string $class): ToolInterface {
+        $tools = array_map(static function (string $class): ToolInterface {
             $tool = new McpToolAdapter(app($class));
             $reason = self::APPROVALS[$tool->getName()] ?? null;
 
             return $reason === null ? $tool : $tool->withApprovalPolicy(static fn (): string => $reason);
         }, self::TOOLS);
+
+        // Solo visualizzazione (KPI, grafici, tabelle): non cambia dati, nessuna conferma.
+        $tools[] = new RenderSurfaceTool;
+
+        return $tools;
     }
 }

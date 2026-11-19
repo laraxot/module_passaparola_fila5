@@ -2,13 +2,12 @@
 // e un server AG-UI finto che risponde in SSE. Esecuzione: NODE_PATH=<node_modules con jsdom> node --test tests/js/
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
 const { JSDOM } = require('jsdom');
-const bundle = fileURLToPath(new URL('../../public/js/operator-assistant.js', import.meta.url));
+// Dal file (non da data:) perche' il bundle importa i chunk condivisi con percorsi relativi.
+const bundle = new URL('../../public/js/operator-assistant.js', import.meta.url);
 
 const html = `<div id="pp-operator-assistant" data-agent-url="https://app.test/run" data-thread-id="operator-7-t1"
   data-csrf="tok" data-i18n='{"approve":"Approva","reject":"Rifiuta","approval_title":"Conferma richiesta"}'>
@@ -41,13 +40,20 @@ const approvalTurn = [
 async function setup(responses) {
     const dom = new JSDOM(html, { url: 'https://app.test/admin' });
     const requests = [];
-    Object.assign(globalThis, { window: dom.window, document: dom.window.document, HTMLElement: dom.window.HTMLElement });
+    const w = dom.window;
+    // il renderer A2UI (Lit) usa le API dei web component: le prende da jsdom
+    Object.assign(globalThis, {
+        window: w, document: w.document, HTMLElement: w.HTMLElement, Element: w.Element, Node: w.Node,
+        customElements: w.customElements, ShadowRoot: w.ShadowRoot, Document: w.Document, DocumentFragment: w.DocumentFragment,
+        MutationObserver: w.MutationObserver, getComputedStyle: w.getComputedStyle.bind(w), CSSStyleSheet: w.CSSStyleSheet,
+        requestAnimationFrame: (callback) => setTimeout(callback, 0),
+    });
     globalThis.fetch = async (url, init) => {
         requests.push({ url, headers: init.headers, body: JSON.parse(init.body) });
         return sse(responses.shift());
     };
-    const source = readFileSync(bundle, 'utf8');
-    const module = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}#${Math.random()}`);
+    // query diversa a ogni test: modulo nuovo, che si monta sulla pagina nuova
+    const module = await import(`${bundle.href}?t=${Math.random()}`);
     return { dom, requests, module, root: dom.window.document.getElementById('pp-operator-assistant') };
 }
 
@@ -99,4 +105,30 @@ test('un\'azione da confermare mostra la card e la decisione riprende il run', a
     assert.equal(resume[0].interruptId, 'call_1');
     assert.deepEqual(resume[0].payload, { approved: true });
     await until(() => [...doc.querySelectorAll('.pp-oa-assistant')].some((b) => b.textContent.includes('Risposta inviata')));
+});
+
+test('un\'interfaccia render_surface resta prima del testo che arriva mentre il renderer si carica', async () => {
+    const surface = JSON.stringify({ a2ui: [{ version: '1.0', createSurface: { surfaceId: 'generated-t', catalogId: 'urn:laraxot:a2ui:panel', components: [
+        { id: 'root', component: 'Column', children: ['k'] },
+        { id: 'k', component: 'Stat', label: 'Domande', value: 42 },
+    ] } }] });
+    const { dom } = await setup([[
+        { type: 'RUN_STARTED', threadId: 'operator-7-t1', runId: 'r4' },
+        { type: 'TOOL_CALL_START', toolCallId: 's1', toolCallName: 'render_surface' },
+        { type: 'TOOL_CALL_END', toolCallId: 's1' },
+        { type: 'TOOL_CALL_RESULT', messageId: 't1', toolCallId: 's1', content: surface, role: 'tool' },
+        { type: 'TEXT_MESSAGE_START', messageId: 'a4', role: 'assistant' },
+        { type: 'TEXT_MESSAGE_CONTENT', messageId: 'a4', delta: 'Settimana tranquilla.' },
+        { type: 'TEXT_MESSAGE_END', messageId: 'a4' },
+        { type: 'RUN_FINISHED', threadId: 'operator-7-t1', runId: 'r4' },
+    ]]);
+    send(dom, 'Report');
+
+    const doc = dom.window.document;
+    await until(() => doc.querySelector('.pp-oa-assistant')?.textContent.includes('tranquilla'));
+    const slot = doc.querySelector('.pp-oa-surface');
+    assert.ok(slot, 'posto della superficie riservato');
+    assert.ok(slot.compareDocumentPosition(doc.querySelector('.pp-oa-assistant')) & dom.window.Node.DOCUMENT_POSITION_FOLLOWING, 'la superficie precede il testo');
+    await until(() => slot.querySelector('a2ui-surface'));
+    assert.equal(slot.querySelector('a2ui-surface').surface.id, 'generated-t');
 });

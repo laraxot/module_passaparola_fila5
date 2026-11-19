@@ -21,6 +21,27 @@ export function mountOperatorAssistant(root) {
     const messageId = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 
     let assistantBubble = null;
+    const toolNames = {};
+    // Renderer A2UI caricato alla prima interfaccia (Lit, Chart.js): la pagina parte leggera.
+    // Il posto della superficie si riserva subito, cosi' resta prima del testo che arriva intanto.
+    let loadRenderer = null;
+    let slot = null;
+    const surface = (content) => {
+        const target = append(document.createElement('div'));
+        target.className = 'pp-oa-surface';
+        assistantBubble = null;
+        loadRenderer ??= import('../../../AI/resources/js/a2ui/render-surfaces.js')
+            .then(({ createSurfaceRenderer }) => createSurfaceRenderer((element) => slot.append(element)));
+
+        return loadRenderer.then((render) => {
+            slot = target;
+            if (!render(content)) {
+                target.remove();
+                note(content, 'text-warning-600');
+            }
+            messages.scrollTop = messages.scrollHeight;
+        });
+    };
 
     const append = (element) => {
         messages.append(element);
@@ -128,7 +149,13 @@ export function mountOperatorAssistant(root) {
             appendMarkdown(assistantBubble, event.delta);
         },
         onToolCallStartEvent({ event }) {
+            toolNames[event.toolCallId] = event.toolCallName;
             note(`→ ${event.toolCallName}`);
+        },
+        onToolCallResultEvent({ event }) {
+            if (toolNames[event.toolCallId] === 'render_surface') {
+                surface(event.content);
+            }
         },
         onRunErrorEvent({ event }) {
             note(`${t.error ?? 'Errore'}: ${event.message}`, 'text-danger-600');

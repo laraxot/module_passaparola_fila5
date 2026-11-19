@@ -48,6 +48,19 @@ Se chiedi una conversazione di un'altra attività, ti risponde che non è access
    Finché non decidi, la chat resta in attesa.
 5. Ricaricando la pagina inizi una conversazione nuova.
 
+## Grafici, numeri e tabelle
+
+Quando la risposta contiene numeri da confrontare o elenchi lunghi, l'assistente li **disegna**:
+riquadri con i numeri principali (con l'andamento rispetto alla settimana prima), grafici e tabelle.
+Sotto scrive una o due frasi con quello che emerge.
+
+![Report settimanale: numeri principali, grafico delle domande per giorno e tabella delle domande senza risposta](images/operator-assistant-report.png)
+
+- Passando il mouse su una barra del grafico vedi il valore esatto.
+- Le tabelle larghe scorrono in orizzontale.
+- Mostrare un grafico non cambia nessun dato: non chiede conferma.
+- Se la coda ha più di tre conversazioni, l'assistente la mostra come tabella.
+
 ## Azioni che chiedono sempre conferma
 
 | Azione | Cosa succede se approvi |
@@ -64,7 +77,8 @@ Leggere la coda, una conversazione, la base di conoscenza o il report **non** ch
 - "Riassumi la conversazione 14."
 - "Prepara una risposta alla 14: consegniamo a Bari Vecchia dalle 19 alle 23, minimo 15 €." (prima te la mostra, poi chiede conferma per inviarla)
 - "Questa domanda arriva spesso: aggiungi alla base di conoscenza che il sabato siamo aperti fino alle 24."
-- "Com'è andata questa settimana? Quali domande sono rimaste senza risposta?"
+- "Com'è andata questa settimana? Quali domande sono rimaste senza risposta?" (risponde con numeri e grafico)
+- "Mostrami in un grafico le domande per giorno."
 
 ## Se qualcosa non va
 
@@ -81,5 +95,8 @@ Leggere la coda, una conversazione, la base di conoscenza o il report **non** ch
 - Modello: il primo fornitore con la chiave fra Groq e OpenRouter (`assistant_providers` del modulo AI).
 - Conversazioni dell'agente nella tabella `ai_agent_messages`, run in attesa di conferma in `ai_agent_runs`.
 - Lo stesso insieme di azioni è disponibile da Claude o Cursor tramite il [server MCP](mcp-server.md).
-- Il client JS si ricompila con `npm install && npm run build` nella cartella del modulo; il file
-  compilato `public/js/operator-assistant.js` è versionato (circa 670 KB, quasi tutto `zod`, richiesto da `@ag-ui/client`).
+- Il client JS si ricompila con `npm install && npm run build` nella cartella del modulo (serve il
+  modulo AI accanto, in `Modules/AI`). I file compilati in `public/js/` sono versionati:
+  `operator-assistant.js` si carica con la pagina (circa 670 KB, quasi tutto `zod`, richiesto da `@ag-ui/client`);
+  `chunks/render-surfaces-*.js` (Lit, Chart.js, renderer A2UI, circa 690 KB) solo alla prima interfaccia.
+- Grafici e tabelle: tool `render_surface` del modulo AI ([AI/docs/agents.md](../../AI/docs/agents.md#interfacce-generate-a2ui)).
