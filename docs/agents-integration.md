@@ -3,9 +3,9 @@ title: "Aprire Passaparola agli agenti: MCP, AG-UI, A2UI, WebMCP (da datomatic/l
 type: analysis
 module: Passaparola
 created: 2026-11-18
-updated: 2026-11-18
-status: proposal
-issues: []
+updated: 2026-11-19
+status: in-progress
+issues: [11]
 discussions: []
 related:
   - ./architecture.md
@@ -53,8 +53,9 @@ Punto chiave: i tool MCP sono classi scritte **una volta** e riusate dall'agente
 
 Il titolare o l'operatore collega Claude o Cursor al proprio account e gestisce l'assistenza da lì.
 
-- Dipendenze: `laravel/mcp`, `laravel/sanctum` (token personali).
-- `Mcp::web('/mcp/passaparola', PassaparolaServer::class)->middleware(['auth:sanctum', 'throttle:60,1'])`.
+- Dipendenze: `laravel/mcp`. Autenticazione con **Passport** (già nel modulo User, OAuth per i client MCP), non Sanctum.
+- **Fatta**: [mcp-server.md](mcp-server.md).
+- `Mcp::web('/mcp/passaparola', PassaparolaServer::class)->middleware(['auth:api', 'throttle:60,1'])`.
 - Tool (in `Modules/Passaparola/app/Mcp/Tools`, ognuno chiama un'Action esistente, filtro per attività dell'utente del token):
 
 | Tool | Action | Annotazione |
@@ -99,7 +100,7 @@ Pochissimo codice, progressivo (se il browser non lo supporta non succede nulla)
 - Service e Controller della demo → Spatie queueable Action; endpoint come Action invocabili.
 - Codice agnostico (adattatori MCP↔neuron, store dei messaggi, endpoint AG-UI) nel modulo AI;
   tool e permessi di dominio in Passaparola.
-- Utenti UUID: il token Sanctum va su `personal_access_tokens` con `tokenable_id` stringa.
+- Utenti UUID: Passport (modulo User) gestisce già token e client.
 - Le chiavi API restano in `.env`.
 
 ## Rischi

@@ -31,10 +31,21 @@
             "Modules\\Passaparola\\Tests\\": "tests/"
         }
     },
-    "require": {},
+    "require": {
+        "laravel/mcp": "^1.1"
+    },
     "repositories": [
-        {"type": "path", "url": "../Xot"},
-        {"type": "path", "url": "../UI"},
-        {"type": "path", "url": "../AI"}
+        {
+            "type": "path",
+            "url": "../Xot"
+        },
+        {
+            "type": "path",
+            "url": "../UI"
+        },
+        {
+            "type": "path",
+            "url": "../AI"
+        }
     ]
 }
