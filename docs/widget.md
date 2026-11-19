@@ -3,7 +3,7 @@ title: "Widget chat incorporabile"
 type: guide
 module: Passaparola
 created: 2026-11-17
-updated: 2026-11-17
+updated: 2026-11-19
 status: active
 issues: []
 discussions: []
@@ -66,10 +66,24 @@ base di conoscenza dell'attività; quello che è delicato passa a una persona.
 - **Privacy**: il token della conversazione resta nel `localStorage` del visitatore; nessun cookie.
   Le domande sono salvate in `ai_messages`: la conservazione è da definire (issue #8).
 
+## WebMCP: l'agente del browser del visitatore
+
+Se il browser del visitatore ha un agente con WebMCP (Chrome, origin trial), il widget gli offre il tool
+**`ask_business`**: l'agente può fare domande all'attività per conto del visitatore.
+
+- Passa dalla stessa funzione della chat (`ask()` in `widget.js`): stessa API, stesso controllo del sito
+  ammesso, stessi limiti, stessa conversazione.
+- La chat si apre e mostra domanda e risposta: il visitatore vede sempre cosa ha chiesto il suo agente.
+- Se la domanda passa a una persona, l'agente lo riceve scritto nella risposta.
+- Se il browser non supporta WebMCP non succede nulla. Si cercano sia `document.modelContext` sia
+  `navigator.modelContext` (l'API è cambiata durante la prova).
+- Mentre una domanda è in attesa lo storico non si ridisegna (contatore `pending`), così un aggiornamento
+  dello storico non cancella il messaggio appena scritto (difetto trovato dal test WebMCP).
+
 ## Test
 
 - `tests/Unit/Widget/ChatWidgetTest.php` (Pest): siti ammessi, chiavi e token, stati, ruoli, codice da incollare.
-- `tests/js/widget.test.cjs` (Node + jsdom): apertura, invio, risposta mostrata come testo, token salvato, Esc.
+- `tests/js/widget.test.cjs` (Node + jsdom, 16 controlli): apertura, invio, risposta mostrata come testo, token salvato, Esc; WebMCP: registrazione, stessa API e conversazione, risposta all'agente, domanda visibile al visitatore, domanda vuota rifiutata.
   Esecuzione: `npm i --no-save jsdom@24 && node tests/js/widget.test.cjs`.
 
 ## Limiti noti

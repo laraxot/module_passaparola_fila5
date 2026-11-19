@@ -94,6 +94,7 @@ nella base di conoscenza?") che usa **gli stessi tool** della fase A in-process.
 Il widget registra nel browser un tool `ask_business` (`navigator.modelContext.registerTool`), così
 l'agente del browser del visitatore può fare domande all'attività passando dalla stessa API pubblica.
 Pochissimo codice, progressivo (se il browser non lo supporta non succede nulla). Tecnologia in origin trial.
+**Fatta**: [widget.md](widget.md#webmcp-lagente-del-browser-del-visitatore).
 
 ## Adattamenti alle regole Laraxot
 

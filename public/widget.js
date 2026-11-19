@@ -81,6 +81,7 @@
     var send = root.querySelector('.pp-send');
     var config = null;
     var pollTimer = null;
+    var pending = 0; // domande in attesa di risposta: lo storico non si ridisegna sopra di loro
 
     function addMessage(role, text) {
         var el = document.createElement('div');
@@ -98,9 +99,9 @@
 
     function loadHistory() {
         var token = readToken();
-        if (!token) { return Promise.resolve(); }
+        if (!token || pending > 0) { return Promise.resolve(); }
         return request('/conversations/' + encodeURIComponent(token) + '/messages')
-            .then(renderHistory)
+            .then(function (data) { if (pending === 0) { renderHistory(data); } })
             .catch(function () { /* conversazione chiusa o scaduta: si riparte */ });
     }
 
@@ -127,21 +128,70 @@
         if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); }
     });
 
+    /**
+     * Invia una domanda all'assistente e la mostra nella chat. Unica strada per la chat e per WebMCP:
+     * stessa API, stessi controlli (sito ammesso, limiti), stesso storico.
+     */
+    function ask(text) {
+        addMessage('visitor', text);
+        pending++;
+        return request('/messages', { method: 'POST', body: JSON.stringify({ message: text, conversation_token: readToken() }) })
+            .then(function (data) {
+                writeToken(data.conversation_token);
+                addMessage('assistant', data.answer);
+                return data;
+            })
+            .finally(function () { pending--; });
+    }
+
     form.addEventListener('submit', function (e) {
         e.preventDefault();
         var text = input.value.trim();
         if (!text) { return; }
-        addMessage('visitor', text);
         input.value = '';
         send.disabled = true;
-        request('/messages', { method: 'POST', body: JSON.stringify({ message: text, conversation_token: readToken() }) })
-            .then(function (data) {
-                writeToken(data.conversation_token);
-                addMessage('assistant', data.answer);
-            })
+        ask(text)
             .catch(function () { addMessage('assistant', config.error); })
             .finally(function () { send.disabled = false; input.focus(); });
     });
+
+    /**
+     * WebMCP (Chrome, origin trial): la pagina espone all'agente del browser del visitatore un tool per
+     * fare domande all'attivita'. Passa da ask(): la domanda e la risposta compaiono anche nella chat,
+     * cosi' il visitatore vede cosa ha chiesto il suo agente. L'API e' passata da navigator.modelContext
+     * a document.modelContext durante la prova: si cercano entrambe. Se manca, non succede nulla.
+     */
+    function registerWebMcpTool(data) {
+        var modelContext = document.modelContext || navigator.modelContext;
+        if (!modelContext || typeof modelContext.registerTool !== 'function') { return; }
+
+        try {
+            modelContext.registerTool({
+                name: 'ask_business',
+                description: 'Fa una domanda a ' + data.name + ' (orari, spedizioni, resi, prenotazioni, servizi). ' +
+                    "Risponde un assistente AI con le sole informazioni ufficiali dell'attività; le richieste delicate passano a una persona dello staff.",
+                inputSchema: {
+                    type: 'object',
+                    properties: { question: { type: 'string', description: 'La domanda, in linguaggio naturale.', maxLength: data.max_length } },
+                    required: ['question'],
+                },
+                annotations: { readOnlyHint: false },
+                execute: function (args) {
+                    var question = String((args && args.question) || '').trim().slice(0, data.max_length);
+                    if (!question) {
+                        return Promise.resolve({ content: [{ type: 'text', text: 'Serve una domanda.' }], isError: true });
+                    }
+                    if (panel.hidden) { open(); }
+                    return ask(question).then(function (reply) {
+                        var text = reply.answer + (reply.handed_off ? ' (Richiesta passata a una persona dello staff: la risposta arriverà nella chat del sito.)' : '');
+                        return { content: [{ type: 'text', text: text }] };
+                    }, function () {
+                        return { content: [{ type: 'text', text: data.error }], isError: true };
+                    });
+                },
+            });
+        } catch (e) { /* API della prova cambiata: il widget continua a funzionare senza WebMCP */ }
+    }
 
     request('/config?lang=' + encodeURIComponent(lang)).then(function (data) {
         config = data;
@@ -155,6 +205,7 @@
         input.setAttribute('maxlength', String(data.max_length));
         send.textContent = data.send;
         addMessage('assistant', data.greeting);
+        registerWebMcpTool(data);
     }).catch(function () {
         root.remove(); // widget spento o sito non ammesso: niente pulsante rotto sulla pagina
     });

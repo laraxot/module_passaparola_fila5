@@ -6,13 +6,16 @@ const src = fs.readFileSync(require('path').join(__dirname, '../../public/widget
 const calls = [];
 const responses = {
   '/config': { name: 'Ceramiche Rossi', greeting: 'Ciao!', ai_notice: 'Risponde un\'AI', placeholder: 'Scrivi', send: 'Invia', open: 'Apri', close: 'Chiudi', error: 'Errore', max_length: 1000 },
+  '/history': { status: 'open', messages: [] },
   '/messages': { conversation_token: 'T'.repeat(48), answer: 'Spedizione 5 euro <b>x</b>', handed_off: false, status: 'open' },
 };
 const dom = new JSDOM('<!doctype html><html lang="it"><head></head><body></body></html>', { runScripts: 'outside-only', url: 'https://www.negozio.it/' });
 const w = dom.window;
-w.fetch = (url, opts) => { calls.push([url, opts && opts.method || 'GET', opts && opts.body]); const k = Object.keys(responses).find(p => url.includes(p)); return Promise.resolve({ ok: true, json: () => Promise.resolve(responses[k]) }); };
+w.fetch = (url, opts) => { calls.push([url, opts && opts.method || 'GET', opts && opts.body]); const k = url.includes('/conversations/') ? '/history' : Object.keys(responses).find(p => url.includes(p)); return Promise.resolve({ ok: true, json: () => Promise.resolve(responses[k]) }); };
 const s = w.document.createElement('script'); s.dataset.key = 'pp_' + 'a'.repeat(40); s.dataset.lang = 'it';
 Object.defineProperty(w.document, 'currentScript', { get: () => ({ src: 'https://app.passaparola.test/assets/passaparola/widget.js', dataset: s.dataset }) });
+let webmcpTool = null;
+w.document.modelContext = { registerTool: (tool) => { webmcpTool = tool; } };
 if (!w.HTMLFormElement.prototype.requestSubmit) w.HTMLFormElement.prototype.requestSubmit = function () { this.dispatchEvent(new w.Event('submit', { cancelable: true })); };
 w.eval(src);
 const tick = () => new Promise(r => setTimeout(r, 20));
@@ -36,5 +39,15 @@ const tick = () => new Promise(r => setTimeout(r, 20));
   ok(w.localStorage.getItem('passaparola:pp_' + 'a'.repeat(40)) === 'T'.repeat(48), 'token salvato');
   w.document.querySelector('.pp-root').dispatchEvent(new w.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   ok($('.pp-panel').hidden === true, 'Esc chiude il pannello');
+  // WebMCP: tool registrato dopo il caricamento della configurazione
+  ok(webmcpTool && webmcpTool.name === 'ask_business' && webmcpTool.description.includes('Ceramiche Rossi'), 'WebMCP: tool ask_business registrato con il nome dell\'attività');
+  ok(JSON.stringify(webmcpTool.inputSchema.required) === '["question"]', 'WebMCP: question obbligatoria');
+  const posts = calls.filter(c => c[1] === 'POST').length;
+  const result = await webmcpTool.execute({ question: 'Fate spedizioni in Svizzera?' });
+  ok(calls.filter(c => c[1] === 'POST').length === posts + 1 && JSON.parse(calls.filter(c => c[1] === 'POST').pop()[2]).conversation_token === 'T'.repeat(48), 'WebMCP: stessa API e stessa conversazione del widget');
+  ok(result.content[0].text.startsWith('Spedizione 5 euro'), 'WebMCP: risposta restituita all\'agente');
+  ok([...w.document.querySelectorAll('.pp-visitor')].some(e => e.textContent === 'Fate spedizioni in Svizzera?') && $('.pp-panel').hidden === false, 'WebMCP: domanda visibile al visitatore nella chat aperta');
+  const empty = await webmcpTool.execute({ question: '   ' });
+  ok(empty.isError === true, 'WebMCP: domanda vuota rifiutata senza chiamare il server');
   process.exit(0);
 })();

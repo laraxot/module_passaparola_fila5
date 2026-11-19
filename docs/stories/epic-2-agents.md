@@ -16,6 +16,6 @@ related:
 | Story | Titolo | Stato |
 |---|---|---|
 | 2.1 | Server MCP (fase A) | in revisione |
-| 2.2 | WebMCP nel widget (fase D) | da fare |
+| 2.2 | WebMCP nel widget (fase D) | in revisione |
 | 2.3 | Assistente dell'operatore AG-UI (fase B) | da fare |
 | 2.4 | Interfacce generate A2UI (fase C) | da fare |

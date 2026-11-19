@@ -28,5 +28,6 @@ discussions: []
 | [stories/1.9.workspace-access.story.md](stories/1.9.workspace-access.story.md) | Accesso per attività |
 | [stories/epic-2-agents.md](stories/epic-2-agents.md) | Epic 2: aprire Passaparola agli agenti |
 | [stories/2.1.mcp-server.story.md](stories/2.1.mcp-server.story.md) | Server MCP |
+| [stories/2.2.webmcp-widget.story.md](stories/2.2.webmcp-widget.story.md) | WebMCP nel widget |
 | [stories/project-decoupling-from-fixcity.story.md](stories/project-decoupling-from-fixcity.story.md) | Progetto indipendente da Fixcity e Sixteen |
 | [stories/1.2.ai-anonymous-threads-and-per-call-keywords.story.md](stories/1.2.ai-anonymous-threads-and-per-call-keywords.story.md) | Prerequisiti nel modulo AI |
